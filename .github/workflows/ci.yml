@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - name: Self-scan (дерево не должно содержать ключей)
+        run: node src/cli.js . --ignore "fixtures/" --fail-on critical
+
+  fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Поддельные секреты из fixtures должны находиться
+        run: |
+          node fixtures/make-leaks.mjs
+          node src/cli.js fixtures/leaks --json > report.json
+          node -e '
+            const r = JSON.parse(require("fs").readFileSync("report.json", "utf8"));
+            const want = [
+              "private-key",
+              "supabase-service-key",
+              "github-token",
+              "aws-access-key",
+              "jwt",
+              "env-assignment",
+              "keystore-file",
+              "ssh-key-file",
+            ];
+            const got = new Set(r.findings.map((f) => f.rule));
+            const missing = want.filter((w) => !got.has(w));
+            if (missing.length) {
+              console.error("не найдено правил:", missing.join(", "));
+              process.exit(1);
+            }
+            const dump = JSON.stringify(r);
+            if (/ghp_[A-Za-z0-9]|AKIA[A-Z0-9]|sb_secret_|-----BEGIN|eyJ/.test(dump)) {
+              console.error("в отчёт попались сами значения");
+              process.exit(1);
+            }
+            console.log("найдено все", want.length, "ожидаемых правила, значения замаскированы");
+          '

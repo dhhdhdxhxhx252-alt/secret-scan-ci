@@ -1,0 +1,8 @@
+node_modules/
+npm-debug.log*
+.DS_Store
+coverage/
+
+# сгенерированные поддельные секреты — только локально
+fixtures/leaks/
+report.json

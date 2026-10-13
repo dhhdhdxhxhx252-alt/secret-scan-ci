@@ -1,0 +1,34 @@
+{
+  "name": "secret-scan-ci",
+  "version": "1.0.0",
+  "description": "Redacting secret scanner for a repo working tree and build output. Never prints the matched value, only file:line, class and a hash.",
+  "type": "module",
+  "bin": {
+    "secret-scan": "src/cli.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "fixtures": "node fixtures/make-leaks.mjs",
+    "scan": "node src/cli.js .",
+    "scan:demo": "npm run fixtures --silent && node src/cli.js fixtures/leaks"
+  },
+  "keywords": [
+    "security",
+    "secrets",
+    "scanner",
+    "ci",
+    "supabase"
+  ],
+  "license": "MIT",
+  "author": "dhhdhdxhxhx252-alt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhhdhdxhxhx252-alt/secret-scan-ci.git"
+  }
+}
