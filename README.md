@@ -21,7 +21,7 @@ node src/cli.js fixtures/leaks         # демо на выдуманных се
 
 ## Пример вывода
 
-Это реальный прогон по `fixtures/leaks/`, значения там выдуманные:
+Это реальный прогон по `fixtures/leaks/` (`npm run scan:demo`), значения там выдуманные:
 
 ```
 CRITICAL fixtures/leaks/id_ed25519  ssh-key-file  (ssh private key file)

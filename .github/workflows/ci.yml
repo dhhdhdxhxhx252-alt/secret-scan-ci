@@ -30,7 +30,8 @@ jobs:
       - name: Поддельные секреты из fixtures должны находиться
         run: |
           node fixtures/make-leaks.mjs
-          node src/cli.js fixtures/leaks --json > report.json
+          # сам сканер возвращается кодом 1 — это ожидаемо, находки есть по определению
+          node src/cli.js fixtures/leaks --json > report.json || true
           node -e '
             const r = JSON.parse(require("fs").readFileSync("report.json", "utf8"));
             const want = [
